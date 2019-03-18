@@ -1,0 +1,6 @@
+// pragmas were added as part of Malproxy build process
+#pragma warning(push)
+#pragma warning(disable: 4100 4800 4146 4125 4244 4291)
+// warning C4125: decimal digit terminates octal escape sequence
+// warning C4100: 'arena': unreferenced formal parameter 
+

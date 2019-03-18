@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <PROTOBUF_SRC_ROOT>$(SolutionDir)third_party\grpc\third_party\protobuf</PROTOBUF_SRC_ROOT>
+    <PROTOBUF_BIN_ROOT>$(SolutionDir)prebuilt\windows\$(Configuration)\$(Platform)</PROTOBUF_BIN_ROOT>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(PROTOBUF_SRC_ROOT)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x600;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(PROTOBUF_BIN_ROOT);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4217 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="PROTOBUF_SRC_ROOT">
+      <Value>$(PROTOBUF_SRC_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="PROTOBUF_BIN_ROOT">
+      <Value>$(PROTOBUF_BIN_ROOT)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

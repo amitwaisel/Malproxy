@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="protobuf_$(Configuration).props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <GRPC_SRC_ROOT>$(SolutionDir)third_party\grpc</GRPC_SRC_ROOT>
+    <GRPC_BIN_ROOT>$(SolutionDir)prebuilt\windows\$(Configuration)\$(Platform)</GRPC_BIN_ROOT>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(GRPC_SRC_ROOT)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x600;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(GRPC_BIN_ROOT);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cares.lib;address_sorting.lib;grpc++.lib;grpc.lib;gpr.lib;ws2_32.lib;ssl.lib;crypto.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4217 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="GRPC_SRC_ROOT">
+      <Value>$(GRPC_SRC_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GRPC_BIN_ROOT">
+      <Value>$(GRPC_BIN_ROOT)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

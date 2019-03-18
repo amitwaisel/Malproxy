@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package malproxy;
+
+service MalproxyInterface {
+	rpc Initialize(InitInformation) returns (InitInformation) {}
+	rpc LoadRemoteLibrary(LoadLibraryRequest) returns (LoadLibraryResponse) {}
+	rpc FreeRemoteLibrary(FreeLibraryRequest) returns (Empty) {}
+	rpc CallFunc(CallFuncRequest) returns (CallFuncResponse) {}
+}
+
+enum Platform {
+	Platform_Win32 = 0;
+	Platform_x64 = 1;
+}
+
+message Empty { } 
+
+message InitInformation {
+	Platform platform = 1;
+}
+
+message HandleType {
+	uint64 handle = 1;
+}
+
+message LoadLibraryRequest {
+	string dll_name = 1;
+}
+
+message LoadLibraryResponse { 
+	HandleType handle = 1;
+}
+
+message FreeLibraryRequest { 
+	HandleType handle = 1;
+}
+
+message CallFuncRequest {
+	string dll_name = 1;
+	string function_name = 2;
+	repeated Argument in_arguments = 3;
+}
+
+enum BufferType {
+	BufferType_UserAllocated = 0;
+	BufferType_SystemAllocated = 1;
+}
+
+message BufferArgument {
+	bytes data = 1;
+	BufferType type = 2;
+	uint64 size = 3; // For cases where required size is returned from API without the buffer
+}
+
+message Argument {
+	string name = 1;
+	oneof arg {
+		int32 int32_val = 10;
+		uint32 uint32_val = 11;
+		int64 int64_val = 12;
+		uint64 uint64_val = 13;
+		bool bool_val = 14;
+		bool empty_val = 15;
+		// uint32 uint32_ptr_val = 20;
+		// uint32 uint64_ptr_val = 21;
+		string string_val = 30;
+		bytes wstring_val = 31;
+		BufferArgument buffer_val = 40;
+		HandleType handle_val = 50;
+	}
+}
+
+message CallFuncResponse {
+	Argument return_value = 1;
+	repeated Argument out_arguments = 2;
+}
