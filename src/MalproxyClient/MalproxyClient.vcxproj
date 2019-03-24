@@ -169,7 +169,6 @@
     <ClCompile Include="MemoryModule.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Hooks.h" />
     <ClInclude Include="MalproxyClientRunner.h" />
     <ClInclude Include="MemoryModule.h" />
   </ItemGroup>
