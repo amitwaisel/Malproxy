@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Event.h" />
     <ClInclude Include="fnptr.h" />
+    <ClInclude Include="NtHelper.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>

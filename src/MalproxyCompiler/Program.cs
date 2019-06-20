@@ -254,12 +254,14 @@ namespace MalproxyCompiler
             OpenProcess.AddParameter(new BoolParameter() {ParameterName = "bInheritHandle"});
             OpenProcess.AddParameter(new UintParameter() {ParameterName = "dwProcessId"});
 
+            FunctionCodeGenerator GetLastError = new FunctionCodeGenerator("Kernel32.dll", "GetLastError", new UintParameter());
+
             CodeGenerator code = new CodeGenerator();
             string target = (args.Length > 0) ? args[0] : string.Empty;
 
             var functions = new[]
             {
-                CreateFileW, OutputDebugStringW, OutputDebugStringA,
+                CreateFileW, OutputDebugStringW, OutputDebugStringA, GetLastError,
                 NtQuerySystemInformation, OpenProcess
             };
 
