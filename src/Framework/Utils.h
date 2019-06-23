@@ -15,4 +15,6 @@ namespace StringUtils
 	std::string Utf16ToUtf8(const std::wstring& utf16_str);
 	
 	std::wstring Basename(const std::wstring& path);
+
+	void PrintBytes(const void* buff, size_t size);
 }

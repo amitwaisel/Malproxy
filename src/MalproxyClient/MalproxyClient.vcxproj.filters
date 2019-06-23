@@ -18,9 +18,6 @@
     <ClCompile Include="MalproxyClientRunner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MalproxyClientMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -29,9 +26,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MemoryModule.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MalproxyClientRunner.h">
       <Filter>Header Files</Filter>
     </ClInclude>

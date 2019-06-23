@@ -25,6 +25,7 @@ public:
 	
 	grpc::Status CallFunc(grpc::ServerContext* context, const malproxy::CallFuncRequest* request, malproxy::CallFuncResponse* response) override;
 	grpc::Status LoadRemoteLibrary(grpc::ServerContext* context, const malproxy::LoadLibraryRequest* request, malproxy::LoadLibraryResponse* response) override;
+	grpc::Status LoadRemoteLibraryEx(grpc::ServerContext* context, const malproxy::LoadLibraryExRequest* request, malproxy::LoadLibraryResponse* response) override;
 	grpc::Status FreeRemoteLibrary(grpc::ServerContext* context, const malproxy::FreeLibraryRequest* request, malproxy::Empty* response) override;
 
 private:

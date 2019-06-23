@@ -26,6 +26,7 @@ public:
 
 	malproxy::CallFuncResponse CallFunc(const malproxy::CallFuncRequest& request);
 	malproxy::LoadLibraryResponse LoadRemoteLibrary(const malproxy::LoadLibraryRequest& request);
+	malproxy::LoadLibraryResponse LoadRemoteLibraryEx(const malproxy::LoadLibraryExRequest& request);
 	void FreeRemoteLibrary(const malproxy::FreeLibraryRequest& request);
 
 private:

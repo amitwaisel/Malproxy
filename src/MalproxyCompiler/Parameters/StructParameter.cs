@@ -113,6 +113,11 @@ namespace MalproxyCompiler.Parameters
         }
     }
 
+    class PUNICODE_STRING : StructPtrParameter
+    {
+        public override string StructType => "UNICODE_STRING";
+    }
+
     class PSLIST_HEADER : StructPtrParameter
     {
         public override string StructType => "SLIST_HEADER";

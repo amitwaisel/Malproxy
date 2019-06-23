@@ -38,6 +38,7 @@ namespace MalproxyCompiler
             string real_func = "real_func";
             function_code.AppendLine($@"malproxy::CallFuncResponse {_function_name}_stub(const malproxy::CallFuncRequest& {request}, FARPROC {real_func})");
             function_code.AppendLine("{");
+            function_code.AppendLine($"printf(\"Running function %s ! %s\\n\", {request}.dll_name().c_str(), {request}.function_name().c_str());");
 
             // out-only arguments will put an empty input argument as a place holder
             for (int argument_index = 0; argument_index < _parameters.Count; argument_index++)
@@ -159,6 +160,7 @@ namespace MalproxyCompiler
 
             code_builder.AppendLine($"#include \"RpcLib/MalproxySession.h\"");
             code_builder.AppendLine($"#include \"Framework/Utils.h\"");
+            code_builder.AppendLine($"#include \"Framework/NtHelper.h\"");
             code_builder.AppendLine($"#include <Windows.h>");
             code_builder.AppendLine($"#include \"MalproxyClientRunner.h\"");
             code_builder.AppendLine();
@@ -197,6 +199,7 @@ namespace MalproxyCompiler
             StringBuilder code_builder = new StringBuilder();
             code_builder.AppendLine($"#include \"RpcLib/MalproxyServer.h\"");
             code_builder.AppendLine($"#include \"Framework/Utils.h\"");
+            code_builder.AppendLine($"#include \"Framework/NtHelper.h\"");
 
             foreach (var func in functions)
             {
@@ -243,16 +246,60 @@ namespace MalproxyCompiler
             FunctionCodeGenerator OutputDebugStringA = new FunctionCodeGenerator("Kernel32.dll", "OutputDebugStringA", null);
             OutputDebugStringA.AddParameter(new StringParameter() { ParameterName = "lpOutputString", Direction = ParameterDirection.in_param });
 
+            var NtQuerySystemInformation_buffer_param = new UserBufferParameter()
+                { ParameterName = "SystemInformation", BufferSizeName = "SystemInformationLength", Direction = ParameterDirection.out_param};
+            NtQuerySystemInformation_buffer_param.RelocationCodeGenerator = RelocateNtQuerySystemInformation;
             FunctionCodeGenerator NtQuerySystemInformation = new FunctionCodeGenerator("ntdll.dll", "NtQuerySystemInformation", new UintParameter());
             NtQuerySystemInformation.AddParameter(new UintParameter() { ParameterName = "SystemInformationClass" });
-            NtQuerySystemInformation.AddParameter(new UserBufferParameter()
-                {ParameterName = "SystemInformation", BufferSizeName = "SystemInformationLength", Direction = ParameterDirection.out_param});
+            NtQuerySystemInformation.AddParameter(NtQuerySystemInformation_buffer_param);
             NtQuerySystemInformation.AddParameter(new UintPtrParameter() {ParameterName = "ReturnLength", Direction = ParameterDirection.out_param});
 
+            FunctionCodeGenerator GetProcessId = new FunctionCodeGenerator("Kernel32.dll", "GetProcessId", new UintParameter());
+            GetProcessId.AddParameter(new HandleParameter() {ParameterName = "Process" });
+
             FunctionCodeGenerator OpenProcess = new FunctionCodeGenerator("Kernel32.dll", "OpenProcess", new HandleParameter());
-            OpenProcess.AddParameter(new UintParameter() {ParameterName = "dwDesiredAccess"});
-            OpenProcess.AddParameter(new BoolParameter() {ParameterName = "bInheritHandle"});
-            OpenProcess.AddParameter(new UintParameter() {ParameterName = "dwProcessId"});
+            OpenProcess.AddParameter(new UintParameter() { ParameterName = "dwDesiredAccess" });
+            OpenProcess.AddParameter(new BoolParameter() { ParameterName = "bInheritHandle" });
+            OpenProcess.AddParameter(new UintParameter() { ParameterName = "dwProcessId" });
+
+            FunctionCodeGenerator OpenProcessToken = new FunctionCodeGenerator("Advapi32.dll", "OpenProcessToken", new BoolParameter());
+            OpenProcessToken.AddParameter(new HandleParameter() {ParameterName = "ProcessHandle" });
+            OpenProcessToken.AddParameter(new UintParameter() { ParameterName = "DesiredAccess" });
+            OpenProcessToken.AddParameter(new HandlePtrParameter() { ParameterName = "TokenHandle", Direction = ParameterDirection.out_param });
+
+            FunctionCodeGenerator NtQueryInformationProcess = new FunctionCodeGenerator("ntdll.dll", "NtQueryInformationProcess", new UintParameter());
+            NtQueryInformationProcess.AddParameter(new HandleParameter() { ParameterName = "ProcessHandle" });
+            NtQueryInformationProcess.AddParameter(new UintParameter() { ParameterName = "PROCESSINFOCLASS" });
+            NtQueryInformationProcess.AddParameter(new UserBufferParameter()
+                { ParameterName = "ProcessInformation", BufferSizeName = "ProcessInformationLength", Direction = ParameterDirection.out_param });
+            NtQueryInformationProcess.AddParameter(new UintPtrParameter() { ParameterName = "ReturnLength", Direction = ParameterDirection.out_param });
+
+            FunctionCodeGenerator ReadProcessMemory = new FunctionCodeGenerator("Kernel32.dll", "ReadProcessMemory", new UintParameter());
+            ReadProcessMemory.AddParameter(new HandleParameter() { ParameterName = "hProcess" });
+            ReadProcessMemory.AddParameter(new VoidPtrParameter() { ParameterName = "lpBaseAddress" });
+            ReadProcessMemory.AddParameter(new UserBufferParameter()
+                { ParameterName = "lpBuffer", BufferSizeName = "nSize", Direction = ParameterDirection.out_param });
+            ReadProcessMemory.AddParameter(new SizeTPtrParameter() { ParameterName = "lpNumberOfBytesRead", Direction = ParameterDirection.out_param });
+
+            FunctionCodeGenerator FileTimeToLocalFileTime = new FunctionCodeGenerator("Kernel32.dll", "FileTimeToLocalFileTime", new BoolParameter());
+            FileTimeToLocalFileTime.AddParameter(new FileTimePtrParameter() { ParameterName = "lpFileTime", Direction = ParameterDirection.in_param });
+            FileTimeToLocalFileTime.AddParameter(new FileTimePtrParameter() { ParameterName = "lpLocalFileTime", Direction = ParameterDirection.out_param });
+
+            FunctionCodeGenerator FileTimeToSystemTime = new FunctionCodeGenerator("Kernel32.dll", "FileTimeToSystemTime", new BoolParameter());
+            FileTimeToSystemTime.AddParameter(new FileTimePtrParameter() { ParameterName = "lpFileTime", Direction = ParameterDirection.in_param });
+            FileTimeToSystemTime.AddParameter(new FileTimePtrParameter() { ParameterName = "lpSystemTime", Direction = ParameterDirection.out_param });
+
+
+            FunctionCodeGenerator RtlAdjustPrivilege = new FunctionCodeGenerator("ntdll.dll", "RtlAdjustPrivilege", new UintParameter());
+            RtlAdjustPrivilege.AddParameter(new UintParameter() { ParameterName = "Privilege" });
+            RtlAdjustPrivilege.AddParameter(new BoolParameter() { ParameterName = "Enable" });
+            RtlAdjustPrivilege.AddParameter(new BoolParameter() { ParameterName = "CurrentThread" });
+            RtlAdjustPrivilege.AddParameter(new BoolPtrParameter() { ParameterName = "Enabled", Direction = ParameterDirection.out_param });
+
+            //FunctionCodeGenerator RtlEqualUnicodeString = new FunctionCodeGenerator("ntdll.dll", "RtlEqualUnicodeString", new BoolParameter());
+            //RtlEqualUnicodeString.AddParameter(new PUNICODE_STRING() {ParameterName = "String1", Direction = ParameterDirection.in_param });
+            //RtlEqualUnicodeString.AddParameter(new PUNICODE_STRING() {ParameterName = "String2", Direction = ParameterDirection.in_param });
+            //RtlEqualUnicodeString.AddParameter(new BoolParameter() {ParameterName = "CaseInSensitive" });
 
             FunctionCodeGenerator GetLastError = new FunctionCodeGenerator("Kernel32.dll", "GetLastError", new UintParameter());
 
@@ -262,11 +309,22 @@ namespace MalproxyCompiler
             var functions = new[]
             {
                 CreateFileW, OutputDebugStringW, OutputDebugStringA, GetLastError,
-                NtQuerySystemInformation, OpenProcess
+                NtQuerySystemInformation, OpenProcess, GetProcessId, OpenProcessToken, NtQueryInformationProcess, ReadProcessMemory, RtlAdjustPrivilege
             };
 
             code.GenerateHomeCode(System.IO.Path.Combine(target, "MalproxyClient", "autogenerated.home.cpp"), functions);
             code.GenerateFieldCode(System.IO.Path.Combine(target, "MalproxyServer", "autogenerated.field.cpp"), functions);
+        }
+
+        private static string RelocateNtQuerySystemInformation(string argument, string size, string relocations)
+        {
+            StringBuilder code = new StringBuilder();
+            code.AppendLine($"if (NT_SUCCESS(raw_retval)) {{");
+            code.AppendLine($" for (SYSTEM_PROCESS_INFORMATION* ptr = (SYSTEM_PROCESS_INFORMATION*){argument}; (char*)ptr < (char*){argument} + {size} && ptr->NextEntryOffset > 0; ptr = (SYSTEM_PROCESS_INFORMATION*)((char*)ptr + ptr->NextEntryOffset)) {{");
+            code.AppendLine($"  {relocations}->add_offsets(((unsigned long long)(ULONG_PTR)&ptr->ImageName.Buffer) - (ULONG_PTR){argument});");
+            code.AppendLine($" }}");
+            code.AppendLine($"}}");
+            return code.ToString();
         }
     }
 }

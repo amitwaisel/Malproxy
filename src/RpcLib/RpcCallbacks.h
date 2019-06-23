@@ -14,5 +14,6 @@ class RpcServerCallbacks
 public:
 	CallFuncCallback CallCollectorFunc;
 	LoadLibraryCallback LoadLibraryFunc;
+	LoadLibraryExCallback LoadLibraryExFunc;
 	FreeLibraryCallback FreeLibraryFunc;
 };

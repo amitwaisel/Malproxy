@@ -2,6 +2,7 @@
 #include "RpcLib/MalproxySession.h"
 #include "Framework/Utils.h"
 #include "MalproxyClientRunner.h"
+#include "Framework/NtHelper.h"
 
 enum args
 {
@@ -23,6 +24,11 @@ int main(int argc, char* argv[])
 {
 	if (argc < ARGV_PAYLOAD_PWD)
 		return usage(argv);
+
+	//std::vector<char> buffer(1024 * 1024);
+	//DWORD retsize = 0;
+	//DWORD raw_retval = ((DWORD(*)(DWORD, LPVOID, DWORD, DWORD*))GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtQuerySystemInformation"))(5, buffer.data(), (DWORD)buffer.size(), &retsize);
+	//SYSTEM_PROCESS_INFORMATION* proc = (SYSTEM_PROCESS_INFORMATION*)buffer.data();
 
 	std::string url = StringUtils::FormatString("%s:%s", argv[ARGV_MALPROXY_SERVER_ADDRESS], argv[ARGV_MALPROXY_SERVER_PORT]);
 	std::shared_ptr<MalproxySession> client = std::make_shared<MalproxySession>();

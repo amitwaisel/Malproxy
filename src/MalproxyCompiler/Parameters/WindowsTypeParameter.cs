@@ -179,7 +179,7 @@ arg_{ParameterName}->set_{ParameterProtobufName}_val(((LARGE_INTEGER*){Parameter
             StringBuilder function_code = new StringBuilder();
             function_code.AppendLine(getFieldOutDeclaration(result_name));
             function_code.AppendLine($"std::unique_ptr<malproxy::{ParameterProtobufName}> {ParameterName}_handle_ptr = std::make_unique<malproxy::{ParameterProtobufName}>();");
-            function_code.AppendLine($"{ParameterName}_handle_ptr->set_handle(*{ParameterName})");
+            function_code.AppendLine($"{ParameterName}_handle_ptr->set_handle((uint64_t)*{ParameterName});");
             function_code.AppendLine($"out_{ParameterName}->set_allocated_handle_val({ParameterName}_handle_ptr.release());");
             return function_code.ToString();
         }

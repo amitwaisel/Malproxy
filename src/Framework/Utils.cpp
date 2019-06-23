@@ -76,3 +76,12 @@ std::wstring StringUtils::Basename(const std::wstring& path)
 {
 	return BasenameInternal<std::wstring, wchar_t>(path, L'\\');
 }
+
+
+void StringUtils::PrintBytes(const void* buff, size_t size)
+{
+	//printf("Printing %zd bytes\n", size);
+	//for (size_t i = 0; i < size; i++)
+	//	printf("%02x ", ((char*)buff)[i]);
+	//printf("\n");
+}

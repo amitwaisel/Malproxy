@@ -55,7 +55,7 @@ namespace MalproxyCompiler.Parameters
             if (!Direction.HasFlag(ParameterDirection.out_param))
                 return string.Empty;
 
-            return $"*{ParameterName} = ({ParameterType}){result_name}.out_arguments({index}).{ParameterProtobufName}_val();";
+            return $"if ({ParameterName} != nullptr) *{ParameterName} = ({ParameterType}){result_name}.out_arguments({index}).{ParameterProtobufName}_val();";
         }
 
         // Serialize OUT parameter on victim side (add to out_arguments). For in-only parameters, add a dummy out_argument

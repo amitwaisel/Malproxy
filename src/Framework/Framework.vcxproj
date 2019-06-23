@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MemoryModule.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="fnptr.h" />
     <ClInclude Include="NtHelper.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="MemoryModule.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>

@@ -36,6 +36,11 @@ malproxy::LoadLibraryResponse MalproxySession::LoadRemoteLibrary(const malproxy:
 	return client->LoadRemoteLibrary(request);
 }
 
+malproxy::LoadLibraryResponse MalproxySession::LoadRemoteLibraryEx(const malproxy::LoadLibraryExRequest& request) const
+{
+	return client->LoadRemoteLibraryEx(request);
+}
+
 void MalproxySession::FreeRemoteLibrary(const malproxy::FreeLibraryRequest& request) const
 {
 	client->FreeRemoteLibrary(request);

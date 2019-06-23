@@ -23,8 +23,8 @@ MalproxyServer::MalproxyServer(const RpcServerCallbacks& callbacks) : _callbacks
 			builder.AddListeningPort("0.0.0.0:8888", grpc::InsecureServerCredentials());
 			builder.RegisterService(this);
 			builder.SetOption(grpc::MakeChannelArgumentOption("grpc.so_reuseport", 1));
-			builder.AddChannelArgument("grpc.keepalive_time_ms", 10000);
-			builder.AddChannelArgument("grpc.keepalive_timeout_ms", 3000);
+			builder.AddChannelArgument("grpc.keepalive_time_ms", 100000);
+			builder.AddChannelArgument("grpc.keepalive_timeout_ms", 30000);
 			builder.AddChannelArgument("grpc.keepalive_permit_without_calls", 1);
 			builder.AddChannelArgument("grpc.http2.min_time_between_pings_ms", 5000);
 			builder.AddChannelArgument("grpc.http2.min_ping_interval_without_data_ms", 5000);
@@ -97,6 +97,12 @@ grpc::Status MalproxyServer::CallFunc(grpc::ServerContext* context, const malpro
 grpc::Status MalproxyServer::LoadRemoteLibrary(grpc::ServerContext * context, const malproxy::LoadLibraryRequest * request, malproxy::LoadLibraryResponse * response)
 {
 	*response = _callbacks.LoadLibraryFunc(*request);
+	return grpc::Status();
+}
+
+grpc::Status MalproxyServer::LoadRemoteLibraryEx(grpc::ServerContext * context, const malproxy::LoadLibraryExRequest * request, malproxy::LoadLibraryResponse * response)
+{
+	*response = _callbacks.LoadLibraryExFunc(*request);
 	return grpc::Status();
 }
 

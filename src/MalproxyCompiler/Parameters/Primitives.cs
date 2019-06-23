@@ -26,7 +26,21 @@ namespace MalproxyCompiler.Parameters
         public override string ParameterProtobufName => "uint64";
         public override string ParameterTypeProtobufCast => "uint64_t";
     }
-    
+
+    class SizeTParameter : BaseParameter
+    {
+        protected override string ParameterType => "SIZE_T";
+        public override string ParameterProtobufName => "uint64";
+        public override string ParameterTypeProtobufCast => "uint64_t";
+    }
+
+    class SizeTPtrParameter : PointerParameter
+    {
+        protected override string ParameterType => "SIZE_T";
+        public override string ParameterProtobufName => "uint64";
+        public override string ParameterTypeProtobufCast => "uint64_t";
+    }
+
     class UintParameter : BaseParameter
     {
         protected override string ParameterType => "DWORD";

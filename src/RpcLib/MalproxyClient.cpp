@@ -77,6 +77,18 @@ malproxy::LoadLibraryResponse MalproxyClient::LoadRemoteLibrary(const malproxy::
 	return response;
 }
 
+malproxy::LoadLibraryResponse MalproxyClient::LoadRemoteLibraryEx(const malproxy::LoadLibraryExRequest& request)
+{
+	ClientContextPtr client_context = std::make_shared<grpc::ClientContext>();
+	auto context_guard = AddContext(client_context); // locks grpc_lock reader
+
+	malproxy::LoadLibraryResponse response;
+	auto status = stub->get()->LoadRemoteLibraryEx(client_context.get(), request, &response);
+	if (!status.ok())
+		THROW("Failed calling remote load library");
+	return response;
+}
+
 void MalproxyClient::FreeRemoteLibrary(const malproxy::FreeLibraryRequest& request)
 {
 	ClientContextPtr client_context = std::make_shared<grpc::ClientContext>();

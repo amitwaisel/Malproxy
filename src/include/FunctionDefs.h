@@ -18,6 +18,7 @@ typedef std::string bytearray;
 
 typedef std::function<malproxy::CallFuncResponse(const malproxy::CallFuncRequest&)> CallFuncCallback;
 typedef std::function<malproxy::LoadLibraryResponse(const malproxy::LoadLibraryRequest&)> LoadLibraryCallback;
+typedef std::function<malproxy::LoadLibraryResponse(const malproxy::LoadLibraryExRequest&)> LoadLibraryExCallback;
 typedef std::function<void(const malproxy::FreeLibraryRequest&)> FreeLibraryCallback;
 
 template<typename Callback>

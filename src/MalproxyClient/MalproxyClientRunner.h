@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include "RpcLib/MalproxySession.h"
-#include "MemoryModule.h"
+#include "Framework/MemoryModule.h"
 
 using Buffer = std::vector<unsigned char>;
 
@@ -28,7 +28,7 @@ public:
 	std::string& GetFakeModuleNameA() { return _module_name_ascii; }
 
 private:
-	Buffer MalproxyReadFile(const std::wstring& path);
+	static Buffer MalproxyReadFile(const std::wstring& path);
 	void HookPayloadCommandLine(const std::wstring& module_path, const std::wstring& pwd, const std::wstring& arguments);
 
 	static MalproxyClientRunner& InstanceImpl(const std::shared_ptr<MalproxySession>& client = nullptr);
@@ -43,6 +43,7 @@ private:
 
 private:
 	std::shared_ptr<MalproxySession> _client;
+	//std::map<HMODULE, std::string> _local_loaded_modules;
 	std::map<HCUSTOMMODULE, std::string> _loaded_modules;
 	std::map<std::string, std::map<std::string, FARPROC>> _hooks;
 	std::wstring _command_line;

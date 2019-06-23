@@ -5,6 +5,7 @@ package malproxy;
 service MalproxyInterface {
 	rpc Initialize(InitInformation) returns (InitInformation) {}
 	rpc LoadRemoteLibrary(LoadLibraryRequest) returns (LoadLibraryResponse) {}
+	rpc LoadRemoteLibraryEx(LoadLibraryExRequest) returns (LoadLibraryResponse) {}
 	rpc FreeRemoteLibrary(FreeLibraryRequest) returns (Empty) {}
 	rpc CallFunc(CallFuncRequest) returns (CallFuncResponse) {}
 }
@@ -28,6 +29,11 @@ message LoadLibraryRequest {
 	string dll_name = 1;
 }
 
+message LoadLibraryExRequest {
+	string dll_name = 1;
+	bytes dll_data = 2;
+}
+
 message LoadLibraryResponse { 
 	HandleType handle = 1;
 }
@@ -47,10 +53,19 @@ enum BufferType {
 	BufferType_SystemAllocated = 1;
 }
 
+message DataRelocation {
+	uint64 offset = 1;
+	uint32 size = 2;
+}
+message DataRelocations {
+	uint64 base_address = 1;
+	repeated uint64 offsets = 2;
+}
 message BufferArgument {
 	bytes data = 1;
 	BufferType type = 2;
 	uint64 size = 3; // For cases where required size is returned from API without the buffer
+	DataRelocations relocations = 4;
 }
 
 message Argument {
