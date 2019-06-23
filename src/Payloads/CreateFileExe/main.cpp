@@ -10,4 +10,13 @@ int main(int argc, char* argv[])
 	OutputDebugStringW(buff);
 	for (int i = 0; i < argc; i++)
 		OutputDebugStringA(argv[i]);
+
+
+	char fn[100] = { 0 };
+	GetModuleFileNameA(nullptr, fn, sizeof(fn));
+	OutputDebugStringA(fn);
+
+	wchar_t wfn[100] = { 0 };
+	GetModuleFileNameW(nullptr, wfn, _countof(wfn));
+	OutputDebugStringW(wfn);
 }

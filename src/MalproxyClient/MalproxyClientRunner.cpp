@@ -207,13 +207,14 @@ void MalproxyClientRunner::HookPayloadCommandLine(const std::wstring& module_pat
 	_module_name_ascii = StringUtils::Utf16ToUtf8(_module_name);
 	SetCurrentDirectoryW(pwd.c_str());
 
+	UNICODE_STRING new_image_path = { 0 };
+	pRtlCreateUnicodeString(&new_image_path, module_path.c_str());
+	pRtlCopyUnicodeString(&params->ImagePathName, &new_image_path);
 #if 0
 	UNICODE_STRING new_command_line = { 0 };
 	UNICODE_STRING new_pwd = { 0 };
-	UNICODE_STRING new_image_path = { 0 };
 	pRtlCreateUnicodeString(&new_command_line, _command_line.c_str());
 	pRtlCreateUnicodeString(&new_pwd, pwd.c_str());
-	pRtlCreateUnicodeString(&new_image_path, module_path.c_str());
 
 	pRtlCopyUnicodeString(&params->CommandLine, &new_command_line);
 	
@@ -221,7 +222,6 @@ void MalproxyClientRunner::HookPayloadCommandLine(const std::wstring& module_pat
 	//params->CurrentDirectory.Handle = CreateFileW(pwd.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
 	//pRtlCopyUnicodeString(&params->CurrentDirectory.DosPath, &new_pwd);
 
-	pRtlCopyUnicodeString(&params->ImagePathName, &new_image_path);
 
 	//// TODO: Hook GetCommandLineA
 	//__acrt_initialize_command_line();
@@ -233,6 +233,14 @@ void MalproxyClientRunner::HookPayloadCommandLine(const std::wstring& module_pat
 #endif
 	OutputDebugStringA(GetCommandLineA());
 	OutputDebugStringW(GetCommandLineW());
+
+	char fn[100] = { 0 };
+	GetModuleFileNameA(nullptr, fn, sizeof(fn));
+	OutputDebugStringA(fn);
+
+	wchar_t wfn[100] = { 0 };
+	GetModuleFileNameW(nullptr, wfn, _countof(wfn));
+	OutputDebugStringW(wfn);
 }
 
 void MalproxyClientRunner::RunRemote(const std::wstring& module_path, const std::wstring& pwd, const std::wstring& arguments)
